@@ -18,10 +18,11 @@
 
   <div>
     <%= form.label :genre, style: "display: block" %>
-    <%= form.select :genre, Movie.genres.keys %>
+    <%= form.select :genre, Movie.rogers_order %>
   </div>
 
   <div>
     <%= form.submit %>
   </div>
 <% end %>
+
