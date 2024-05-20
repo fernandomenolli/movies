@@ -1,0 +1,11 @@
+pt:
+  activerecord:
+    attributes:
+      movie:
+        genres:
+          action: "Ação"
+          adventure: "Aventura"
+          drama: "Drama"
+          comedy: "Comédia"
+          horror: "Terror"
+          news: "Notícias"
