@@ -21,13 +21,28 @@ class MoviesController < ApplicationController
 
   # POST /movies or /movies.json
   def create
-    @movie = Movie.new(movie_params)
+    movies = movie_params[:names].to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
+    genre = movie_params[:genre]
 
-    respond_to do |format|
-      if @movie.save
-        format.html { redirect_to movie_url(@movie), notice: 'Movie was successfully created.' }
-        format.json { render :show, status: :created, location: @movie }
-      else
+    if movies.present? && genre.present?
+      movies.sort!
+
+      movie_records = movies.map { |name| Movie.new(name:, genre:) }
+      saved = movie_records.all?(&:save)
+
+      respond_to do |format|
+        if saved
+          format.html { redirect_to movies_path, notice: 'Movies were successfully created.' }
+          format.json { render :index, status: :created, location: movie_records }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: movie_records.map(&:errors), status: :unprocessable_entity }
+        end
+      end
+    else
+      @movie = Movie.new
+      @movie.errors.add(:base, 'Movie names and genre are required')
+      respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @movie.errors, status: :unprocessable_entity }
       end
@@ -50,7 +65,6 @@ class MoviesController < ApplicationController
   # DELETE /movies/1 or /movies/1.json
   def destroy
     @movie.destroy!
-
     respond_to do |format|
       format.html { redirect_to movies_url, notice: 'Movie was successfully destroyed.' }
       format.json { head :no_content }
@@ -66,6 +80,6 @@ class MoviesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def movie_params
-    params.require(:movie).permit(:name, :genre)
+    params.require(:movie).permit(:genre, :names)
   end
 end
