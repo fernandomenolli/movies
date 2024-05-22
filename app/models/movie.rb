@@ -2,6 +2,7 @@
 
 class Movie < ApplicationRecord
   enum :genre, %i[action adventure drama comedy horror news]
+  belongs_to :user
 
   def self.rogers_order
     %i[action news adventure drama comedy horror].map do |genre|
